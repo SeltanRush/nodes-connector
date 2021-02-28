@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test connector</title>
+  </head>
+  <body>
+    <style>
+      button {
+        position: absolute;
+        transition: all 0.5s;
+        top: 50%;
+        left: 50%;
+      }
+    </style>
+
+    <div id="root"></div>
+
+    <script>
+      const count = 100;
+      const elements = new Array(100).fill(0).map((_, i) => {
+        const element = document.createElement("button");
+        element.textContent = "The button";
+        element.id = `id${i}`;
+        element.addEventListener("mouseover", () => {
+          element.style.left = Math.random() * 700 + "px";
+          element.style.top = Math.random() * 7000 + "px";
+        });
+        element.addEventListener("click", () => alert("oops"));
+        return element;
+      });
+      document.getElementById("root").append(...elements);
+    </script>
+    <script src="main.js"></script>
+  </body>
+</html>

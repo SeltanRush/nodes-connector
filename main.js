@@ -1,6 +1,6 @@
-const OBSERVER_INTERVAL = 50;
+window.connectNodes = (() => {
+  const OBSERVER_INTERVAL = 50;
 
-const connectNodes = (() => {
   const connectionsWrapperNode = document.createElementNS(
     "http://www.w3.org/2000/svg",
     "svg"
@@ -11,6 +11,7 @@ const connectNodes = (() => {
   connectionsWrapperNode.style.pointerEvents = "none";
   connectionsWrapperNode.style.top = 0;
   connectionsWrapperNode.style.left = 0;
+  connectionsWrapperNode.style.zIndex = 1000000;
 
   document.body.appendChild(connectionsWrapperNode);
 
@@ -67,10 +68,10 @@ const connectNodes = (() => {
       );
 
       const isPositionChanged =
-        connectionNode.attributes.x1 !== x1 ||
-        connectionNode.attributes.x2 !== x2 ||
-        connectionNode.attributes.y1 !== y1 ||
-        connectionNode.attributes.y2 !== y2;
+        +connectionNode.getAttribute("x1") !== x1 ||
+        +connectionNode.getAttribute("x2") !== x2 ||
+        +connectionNode.getAttribute("y1") !== y1 ||
+        +connectionNode.getAttribute("y2") !== y2;
 
       if (isPositionChanged) {
         connectionNode.setAttribute("x1", x1);
@@ -84,11 +85,33 @@ const connectNodes = (() => {
       connectionNode.remove();
     };
 
-    const observer = setInterval(() => {
+    const shouldRemoveConnection = () => {
       if (
-        document.body.contains(firstNode) &&
-        document.body.contains(secondNode)
+        !document.body.contains(firstNode) ||
+        !document.body.contains(secondNode)
       ) {
+        return true;
+      }
+
+      if (!isElementVisible(firstNode) || !isElementVisible(secondNode)) {
+        return true;
+      }
+
+      return false;
+    };
+
+    const isElementVisible = (element) => {
+      const style = getComputedStyle(element);
+      const rect = element.getBoundingClientRect();
+      if (style.display === "none") return false;
+      if (style.visibility !== "visible") return false;
+      if (rect.width === 0 && rect.height === 0) {
+        return false;
+      }
+    };
+
+    const observer = setInterval(() => {
+      if (shouldRemoveConnection()) {
         renderConnection();
       } else {
         removeConnection();
